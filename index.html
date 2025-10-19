@@ -1,47 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AG Church Poonamallee – Sunday Class Attendance</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AG Church Poonamallee - Sunday Class Attendance</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body class="bg-green-50 font-sans">
   <div class="max-w-6xl mx-auto p-6">
-    <!-- Header -->
     <div class="flex items-center mb-6">
-      <img src="logo.png" alt="AG Church Logo" class="w-20 h-20 rounded-xl mr-4 shadow-md">
+      <img src="AGCP CM LOGO 2025 - Made with PosterMyWall.png" alt="Logo" class="w-24 h-24 rounded-xl mr-4">
       <div>
         <h1 class="text-2xl font-bold text-green-700">AG Church Poonamallee – Sunday Class Attendance</h1>
         <p class="text-gray-600 italic">Jesus wants little children to learn about Him</p>
       </div>
     </div>
 
-    <!-- Form -->
+    <!-- Form Section -->
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label class="block text-gray-700 font-semibold mb-1">Teacher Name</label>
-          <input id="teacherName" type="text" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Enter name" required>
+          <input type="text" id="teacherName" class="w-full border border-gray-300 rounded-lg p-2" placeholder="Enter name">
         </div>
         <div>
           <label class="block text-gray-700 font-semibold mb-1">Date</label>
-          <input id="attendanceDate" type="date" class="w-full border border-gray-300 rounded-lg p-2" required>
+          <input type="date" id="attendanceDate" class="w-full border border-gray-300 rounded-lg p-2">
         </div>
         <div>
           <label class="block text-gray-700 font-semibold mb-1">Check-In Time</label>
-          <input id="checkInTime" type="time" class="w-full border border-gray-300 rounded-lg p-2" required>
+          <input type="time" id="checkInTime" class="w-full border border-gray-300 rounded-lg p-2">
         </div>
       </div>
-
       <button onclick="submitAttendance()" class="mt-4 bg-gradient-to-r from-green-600 to-yellow-500 text-white font-semibold py-2 px-6 rounded-lg hover:opacity-90">
         ✅ Submit Attendance
       </button>
-
-      <p id="status" class="text-center text-sm mt-3 text-green-700 font-semibold"></p>
     </div>
 
-    <!-- Table -->
+    <!-- Table Section -->
     <div class="bg-white rounded-2xl shadow-md p-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-green-700">📋 Attendance Records</h2>
@@ -56,7 +54,7 @@
               <th class="py-2 px-4 border">#</th>
               <th class="py-2 px-4 border">Name</th>
               <th class="py-2 px-4 border">Date</th>
-              <th class="py-2 px-4 border">Check-In</th>
+              <th class="py-2 px-4 border">Check-In Time</th>
               <th class="py-2 px-4 border">Action</th>
             </tr>
           </thead>
@@ -64,66 +62,63 @@
           </tbody>
         </table>
       </div>
+
+      <button onclick="downloadExcel()" class="mt-4 bg-yellow-500 text-white font-semibold py-2 px-6 rounded-lg hover:bg-yellow-600">
+        ⬇️ Download Excel File
+      </button>
     </div>
 
     <p class="text-center text-gray-500 mt-6 text-sm">AG Church Poonamallee • Children’s Ministry</p>
   </div>
 
   <script>
-    // 🌿 Admin PIN (change anytime)
+    // Admin PIN (you can change this)
     const ADMIN_PIN = "4321";
 
     // Load saved records
     let records = JSON.parse(localStorage.getItem('attendanceRecords')) || [];
     displayRecords();
 
-    // Auto-fill today’s date
-    document.getElementById('attendanceDate').valueAsDate = new Date();
-
     function submitAttendance() {
       const name = document.getElementById('teacherName').value.trim();
       const date = document.getElementById('attendanceDate').value;
-      const checkin = document.getElementById('checkInTime').value;
+      const checkIn = document.getElementById('checkInTime').value;
 
-      if (!name || !date || !checkin) {
+      if (!name || !date || !checkIn) {
         alert("⚠️ Please fill all fields!");
         return;
       }
 
-      const record = { name, date, checkin };
+      const record = { name, date, checkIn };
       records.push(record);
       localStorage.setItem('attendanceRecords', JSON.stringify(records));
       displayRecords();
 
-      document.getElementById('teacherName').value = "";
-      document.getElementById('checkInTime').value = "";
-      document.getElementById('status').textContent = "✅ Attendance recorded successfully!";
-
-      // 🕊️ Optional: Send to Google Sheets (activate later)
-      // sendToGoogleSheets(record);
+      // Reset form
+      document.getElementById('teacherName').value = '';
+      document.getElementById('attendanceDate').value = '';
+      document.getElementById('checkInTime').value = '';
     }
 
     function displayRecords() {
       const table = document.getElementById('attendanceTable');
       table.innerHTML = '';
       records.forEach((rec, index) => {
-        const row = `
-          <tr class="border hover:bg-green-50">
-            <td class="py-2 px-4 border">${index + 1}</td>
-            <td class="py-2 px-4 border">${rec.name}</td>
-            <td class="py-2 px-4 border">${rec.date}</td>
-            <td class="py-2 px-4 border">${rec.checkin}</td>
-            <td class="py-2 px-4 border">
-              <button onclick="confirmAdmin('delete', ${index})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                Delete
-              </button>
-            </td>
-          </tr>`;
+        const row = `<tr class="border hover:bg-green-50">
+          <td class="py-2 px-4 border">${index + 1}</td>
+          <td class="py-2 px-4 border">${rec.name}</td>
+          <td class="py-2 px-4 border">${rec.date}</td>
+          <td class="py-2 px-4 border">${rec.checkIn}</td>
+          <td class="py-2 px-4 border">
+            <button onclick="confirmAdmin('delete', ${index})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+              Delete
+            </button>
+          </td>
+        </tr>`;
         table.innerHTML += row;
       });
     }
 
-    // 🔐 Admin protection
     function confirmAdmin(action, index = null) {
       const pin = prompt("🔐 Enter admin PIN to continue:");
       if (pin === ADMIN_PIN) {
@@ -148,16 +143,16 @@
       }
     }
 
-    // 🕊️ Optional Google Sheets integration (activate later)
-    /*
-    async function sendToGoogleSheets(record) {
-      const response = await fetch("YOUR_WEB_APP_URL_HERE", {
-        method: "POST",
-        body: JSON.stringify(record),
-        headers: { "Content-Type": "application/json" },
-      });
+    function downloadExcel() {
+      if (records.length === 0) {
+        alert("No records to download!");
+        return;
+      }
+      const ws = XLSX.utils.json_to_sheet(records);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+      XLSX.writeFile(wb, "Sunday_Class_Attendance.xlsx");
     }
-    */
   </script>
 </body>
 </html>
